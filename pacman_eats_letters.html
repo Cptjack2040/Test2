@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Eats Letters</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+        .letter {
+            margin: 5px;
+            font-size: 24px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+        }
+        #pacman {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background-color: yellow;
+            border-radius: 50%;
+            clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+            animation: pacman-animation 0.5s infinite;
+            transition: top 0.3s, left 0.3s;
+        }
+        @keyframes pacman-animation {
+            0% { clip-path: polygon(100% 50%, 0% 0%, 0% 100%); }
+            50% { clip-path: polygon(100% 50%, 20% 20%, 20% 80%); }
+            100% { clip-path: polygon(100% 50%, 0% 0%, 0% 100%); }
+        }
+    </style>
+</head>
+<body>
+    <div id="pacman"></div>
+    <script>
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const gridRows = 10;
+        const gridCols = 10;
+        const letterElements = [];
+        let pacman = document.getElementById('pacman');
+        let pacmanRow = 0;
+        let pacmanCol = 0;
+
+        function getRandomLetter() {
+            return letters[Math.floor(Math.random() * letters.length)];
+        }
+
+        function createLetterElement(letter, row, col) {
+            const letterElement = document.createElement('div');
+            letterElement.className = 'letter';
+            letterElement.textContent = letter;
+            letterElement.style.top = `${row * 40}px`;
+            letterElement.style.left = `${col * 40}px`;
+            document.body.appendChild(letterElement);
+            return letterElement;
+        }
+
+        function placeLetters() {
+            for (let row = 0; row < gridRows; row++) {
+                for (let col = 0; col < gridCols; col++) {
+                    const letter = getRandomLetter();
+                    const letterElement = createLetterElement(letter, row, col);
+                    letterElements.push(letterElement);
+                }
+            }
+        }
+
+        function movePacman() {
+            let target = letterElements.find(el => {
+                return parseInt(el.style.top) === pacmanRow * 40 && parseInt(el.style.left) === pacmanCol * 40;
+            });
+
+            if (target) {
+                target.remove();
+                letterElements.splice(letterElements.indexOf(target), 1);
+            }
+
+            pacman.style.top = `${pacmanRow * 40}px`;
+            pacman.style.left = `${pacmanCol * 40}px`;
+
+            pacmanCol++;
+            if (pacmanCol >= gridCols) {
+                pacmanCol = 0;
+                pacmanRow++;
+            }
+
+            if (letterElements.length > 0 && pacmanRow < gridRows) {
+                setTimeout(movePacman, 300);
+            } else {
+                alert('Pac-Man has eaten all the letters!');
+            }
+        }
+
+        placeLetters();
+        movePacman();
+    </script>
+</body>
+</html>
